@@ -46,7 +46,22 @@ function applyGitBookCompat(src: string): string {
     (_match, content: string) => `==${content}==`
   );
 
-  // 4. {% content-ref url="X" %}[label](X){% endcontent-ref %} → [label](X)
+  // 4. {% stepper %}{% step %}...{% endstep %}{% endstepper %}
+  //    → :::stepper\n:::step\n...\n:::\n:::
+  //    Нативный node-тип в форке (см. nodes/Stepper.tsx, nodes/Step.tsx)
+  src = src.replace(
+    /\{%\s*stepper\s*%\}([\s\S]*?)\{%\s*endstepper\s*%\}/g,
+    (_match, content: string) => {
+      const inner = content.replace(
+        /\{%\s*step\s*%\}([\s\S]*?)\{%\s*endstep\s*%\}/g,
+        (__: string, stepBody: string) =>
+          `\n:::step\n${stepBody.trim()}\n:::\n`
+      );
+      return `\n::::stepper\n${inner.trim()}\n::::\n`;
+    }
+  );
+
+  // 5. {% content-ref url="X" %}[label](X){% endcontent-ref %} → [label](X)
   //    Outline сам построит unfurl-карточку для внутренних ссылок.
   //    Если содержимое блока пустое — берём имя файла из url.
   src = src.replace(
@@ -75,9 +90,13 @@ export default function notice(md: MarkdownIt): void {
     return false;
   });
 
+  // Ограничиваем notice известными стилями — это освобождает маркер `:::`
+  // для других контейнеров (stepper, step) с тем же символом.
+  const NOTICE_STYLES = new Set(["info", "warning", "success", "tip"]);
+
   return customFence(md, "notice", {
     marker: ":",
-    validate: () => true,
+    validate: (params: string) => NOTICE_STYLES.has(params.trim()),
     render(tokens: Token[], idx: number) {
       const { info } = tokens[idx];
 

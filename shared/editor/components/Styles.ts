@@ -1374,6 +1374,73 @@ ${
   }
 }
 
+.stepper-block {
+  counter-reset: step-counter;
+  margin: 1em 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.stepper-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.stepper-step {
+  counter-increment: step-counter;
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 8px 0;
+  position: relative;
+}
+
+.stepper-step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 15px;
+  top: 36px;
+  bottom: -4px;
+  width: 2px;
+  background: ${props.theme.divider};
+}
+
+.stepper-step-marker {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: ${props.theme.background};
+  border: 2px solid ${props.theme.accent};
+  color: ${props.theme.accent};
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  user-select: none;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.stepper-step-marker::before {
+  content: counter(step-counter);
+}
+
+.stepper-step-body {
+  min-width: 0;
+  padding-top: 4px;
+}
+
+.stepper-step-body > *:first-child {
+  margin-top: 0;
+}
+
+.stepper-step-body > *:last-child {
+  margin-bottom: 0;
+}
+
 blockquote {
   margin: 0;
   padding: 8px 10px 8px 1.5em;
