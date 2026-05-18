@@ -46,6 +46,25 @@ function applyGitBookCompat(src: string): string {
     (_match, content: string) => `==${content}==`
   );
 
+  // 4. {% content-ref url="X" %}[label](X){% endcontent-ref %} → [label](X)
+  //    Outline сам построит unfurl-карточку для внутренних ссылок.
+  //    Если содержимое блока пустое — берём имя файла из url.
+  src = src.replace(
+    /\{%\s*content-ref\s+url="([^"]+)"[^%]*%\}([\s\S]*?)\{%\s*endcontent-ref\s*%\}/g,
+    (_match, url: string, inner: string) => {
+      const linkMatch = inner.match(/\[([^\]]+)\]\([^)]+\)/);
+      const label = linkMatch
+        ? linkMatch[1]
+        : url
+            .split("/")
+            .pop()!
+            .replace(/\.md$/, "")
+            .replace(/-/g, " ");
+      const cleanUrl = url.replace(/\.md$/, "");
+      return `\n[${label}](${cleanUrl})\n`;
+    }
+  );
+
   return src;
 }
 
