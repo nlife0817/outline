@@ -16,7 +16,7 @@ export default createGlobalStyle<Props>`
   }
 
   html {
-    --line-height-body: 1.5;
+    --line-height-body: 1.65;
     --font-size-body: 16px;
   }
 
@@ -56,6 +56,7 @@ export default createGlobalStyle<Props>`
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    font-feature-settings: "ss03", "cv05", "cv11";
 
     ${(props) => (props.staticHTML ? "" : "width: 100vw;")}
     overflow-x: hidden;
@@ -95,16 +96,17 @@ export default createGlobalStyle<Props>`
   h4,
   h5,
   h6 {
-    font-weight: 500;
+    font-weight: 700;
     line-height: var(--line-height-h);
+    letter-spacing: -0.012em;
     margin-top: 1em;
     margin-bottom: 0.5em;
   }
-  h1 { font-size: 36px; }
-  h2 { font-size: 26px; }
+  h1 { font-size: 32px; letter-spacing: -0.02em; }
+  h2 { font-size: 24px; letter-spacing: -0.016em; }
   h3 { font-size: 20px; }
-  h4 { font-size: 18px; }
-  h5 { font-size: 16px; }
+  h4 { font-size: 17px; }
+  h5 { font-size: 15px; }
 
   p,
   dl,

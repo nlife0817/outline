@@ -24,7 +24,7 @@ const defaultColors: Colors = {
   black10: "rgba(0, 0, 0, 0.1)",
   black50: "rgba(0, 0, 0, 0.50)",
   black75: "rgba(0, 0, 0, 0.75)",
-  accent: "#0366d6",
+  accent: "#346DDB",
   yellow: "#EDBA07",
   warmGrey: "#EDF2F7",
   danger: "#ed2651",
@@ -59,14 +59,14 @@ const buildBaseTheme = (input: Partial<Colors>) => {
 
   return {
     fontFamily:
-      "-apple-system, BlinkMacSystemFont, Inter, 'Segoe UI', Roboto, Oxygen, sans-serif",
+      "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif",
     fontFamilyMono:
-      "'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace",
+      "'JetBrains Mono', ui-monospace, 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace",
     fontFamilyEmoji:
       "Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Segoe UI, Twemoji Mozilla, Noto Color Emoji, Android Emoji",
     fontWeightRegular: 400,
-    fontWeightMedium: 500,
-    fontWeightBold: 600,
+    fontWeightMedium: 600,
+    fontWeightBold: 700,
     accentText: colors.white,
     selected: colors.accent,
     textHighlight: "#FDEA9B",
