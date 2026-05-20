@@ -99,14 +99,42 @@ export default createGlobalStyle<Props>`
     font-weight: 700;
     line-height: var(--line-height-h);
     letter-spacing: -0.012em;
-    margin-top: 1em;
     margin-bottom: 0.5em;
   }
-  h1 { font-size: 32px; letter-spacing: -0.02em; }
-  h2 { font-size: 24px; letter-spacing: -0.016em; }
-  h3 { font-size: 20px; }
-  h4 { font-size: 17px; }
-  h5 { font-size: 15px; }
+  h1 {
+    font-size: 36px;
+    letter-spacing: -0.022em;
+    line-height: 1.15;
+    margin-top: 1.2em;
+  }
+  h2 {
+    font-size: 26px;
+    letter-spacing: -0.018em;
+    line-height: 1.2;
+    margin-top: 1.5em;
+  }
+  h3 {
+    font-size: 20px;
+    letter-spacing: -0.012em;
+    margin-top: 1.4em;
+  }
+  h4 {
+    font-size: 17px;
+    margin-top: 1.2em;
+  }
+  h5 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-top: 1em;
+  }
+  h6 {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: ${s("textSecondary")};
+    margin-top: 1em;
+  }
 
   p,
   dl,
@@ -122,6 +150,42 @@ export default createGlobalStyle<Props>`
     border: 0;
     height: 0;
     border-top: 1px solid ${s("divider")};
+  }
+
+  /* GitBook-style thin scrollbars (sidebar, TOC, scrollable containers).
+     Track is transparent; thumb is faint and brightens on hover. */
+  #sidebar *,
+  [data-toc-list],
+  .scrollable {
+    scrollbar-width: thin;
+    scrollbar-color: ${(props) =>
+      props.theme.isDark
+        ? "rgba(255,255,255,0.12) transparent"
+        : "rgba(0,0,0,0.18) transparent"};
+  }
+  #sidebar *::-webkit-scrollbar,
+  [data-toc-list]::-webkit-scrollbar,
+  .scrollable::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  #sidebar *::-webkit-scrollbar-track,
+  [data-toc-list]::-webkit-scrollbar-track,
+  .scrollable::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  #sidebar *::-webkit-scrollbar-thumb,
+  [data-toc-list]::-webkit-scrollbar-thumb,
+  .scrollable::-webkit-scrollbar-thumb {
+    background: ${(props) =>
+      props.theme.isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.18)"};
+    border-radius: 6px;
+  }
+  #sidebar *::-webkit-scrollbar-thumb:hover,
+  [data-toc-list]::-webkit-scrollbar-thumb:hover,
+  .scrollable::-webkit-scrollbar-thumb:hover {
+    background: ${(props) =>
+      props.theme.isDark ? "rgba(255,255,255,0.28)" : "rgba(0,0,0,0.32)"};
   }
 
   :focus-visible {
