@@ -46,8 +46,13 @@ function DocumentLink(
     !!node.children.length || activeDocument?.parentDocumentId === node.id;
   const document = documents.get(node.id);
 
-  // GitBook-like fork: do NOT auto-expand any nodes — the user expands
-  // accordions manually. Top-level sections collapse by default too.
+  // Auto-expand top-level nodes (depth <= 1) on initial render
+  React.useEffect(() => {
+    if (hasChildDocuments && depth <= 1 && !expansion.isExpanded(node.id)) {
+      expansion.expand(node.id);
+    }
+  }, [expansion, node.id, hasChildDocuments, depth]);
+
   const expanded = expansion.isExpanded(node.id);
 
   const handleDisclosureClick = React.useCallback(

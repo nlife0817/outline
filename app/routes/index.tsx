@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { Switch, Redirect } from "react-router-dom";
 import DesktopRedirect from "~/scenes/DesktopRedirect";
-import BrandLogo from "~/components/BrandLogo";
 import DelayedMount from "~/components/DelayedMount";
 import FullscreenLoading from "~/components/FullscreenLoading";
 import Route from "~/components/ProfiledRoute";
@@ -30,7 +29,6 @@ export default function Routes() {
         </DelayedMount>
       }
     >
-      <BrandLogo />
       {env.ROOT_SHARE_ID ? (
         <Switch>
           <Route exact path="/" component={Shared} />
