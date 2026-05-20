@@ -117,13 +117,16 @@ function SidebarLink(
     []
   );
 
+  // GitBook-style active state: no background pill, only a colored left bar
+  // and primary-tinted, semibold label.
   const activeStyle = React.useMemo(
     () => ({
-      color: theme.text,
-      background: theme.sidebarActiveBackground,
+      color: theme.accent,
+      background: "transparent",
+      fontWeight: 600,
       ...style,
     }),
-    [theme.text, theme.sidebarActiveBackground, style]
+    [theme.accent, style]
   );
 
   const handleClick = React.useCallback(
@@ -305,6 +308,18 @@ const Link = styled(NavLink)<{
   border: 0;
   width: 100%;
   ${undraggableOnDesktop()}
+
+  /* GitBook-style active indicator: 2px vertical bar in accent color. */
+  &[aria-current="page"]::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 4px;
+    bottom: 4px;
+    width: 2px;
+    background: ${(props) => props.theme.accent};
+    border-radius: 0 2px 2px 0;
+  }
 
   ${(props) =>
     props.$disabled &&
