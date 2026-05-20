@@ -32,7 +32,7 @@ export const TeamPreferenceDefaults: TeamPreferences = {
   [TeamPreference.PublicBranding]: false,
   [TeamPreference.Commenting]: true,
   [TeamPreference.CustomTheme]: undefined,
-  [TeamPreference.TocPosition]: TOCPosition.Left,
+  [TeamPreference.TocPosition]: TOCPosition.Right,
   [TeamPreference.PreventDocumentEmbedding]: false,
   [TeamPreference.EmailDisplay]: EmailDisplay.Members,
   [TeamPreference.MCP]: true,

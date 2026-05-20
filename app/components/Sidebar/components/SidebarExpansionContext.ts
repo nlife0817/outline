@@ -1,5 +1,5 @@
 import { action, observable } from "mobx";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import type { NavigationNode } from "@shared/types";
 
 /**
@@ -183,17 +183,12 @@ export function useSidebarExpansionState(
   activeDocumentId: string | undefined
 ): SidebarExpansionState {
   const [state] = useState(() => new SidebarExpansionState());
-
-  useEffect(() => {
-    if (!roots || !activeDocumentId) {
-      return;
-    }
-    const path = computeAncestorPath(roots, activeDocumentId);
-    if (path.length > 0) {
-      state.expandPath(path);
-    }
-  }, [state, roots, activeDocumentId]);
-
+  // GitBook-like fork: keep the tree fully collapsed by default — the user
+  // expands branches manually. computeAncestorPath kept (re-exported for
+  // potential future use), but no longer auto-expands here.
+  void computeAncestorPath;
+  void roots;
+  void activeDocumentId;
   return state;
 }
 

@@ -61,7 +61,7 @@ function SharedDocumentHeader({ document }: Props) {
   const { shareId, sharedTree, allowSubscriptions } = useShare();
   const share = shareId ? shares.get(shareId) : undefined;
   const team = useTeamContext() as PublicTeam | undefined;
-  const tocPosition = team?.tocPosition ?? TOCPosition.Left;
+  const tocPosition = team?.tocPosition ?? TOCPosition.Right;
   const isMobile = isMobileMedia || (size.width > 0 && size.width < 700);
 
   const handleToggle = useCallback(() => {

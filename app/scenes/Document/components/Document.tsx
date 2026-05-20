@@ -264,7 +264,7 @@ function DocumentScene({
   const tocPos =
     tocPosition ??
     ((team?.getPreference(TeamPreference.TocPosition) as TOCPosition) ||
-      TOCPosition.Left);
+      TOCPosition.Right);
   const showContents =
     tocPos && (isShare ? ui.tocVisible !== false : ui.tocVisible === true);
   const tocOffset =
