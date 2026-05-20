@@ -104,7 +104,7 @@ function SidebarLink(
   const { handleMouseEnter, handleMouseLeave } = useClickIntent(onClickIntent);
   const style = React.useMemo(
     () => ({
-      paddingInlineStart: `${(depth || 0) * 16 + (icon ? -8 : 12)}px`,
+      paddingInlineStart: `${(depth || 0) * 12 + (icon ? -8 : 10)}px`,
       paddingInlineEnd: unreadBadge ? "32px" : undefined,
     }),
     [depth, icon, unreadBadge]
@@ -290,16 +290,16 @@ const Link = styled(NavLink)<{
   position: relative;
   text-overflow: ellipsis;
   font-weight: 475;
-  padding: ${isMobile() ? 12 : 6}px 16px;
-  border-radius: 4px;
-  min-height: 30px;
+  padding: ${isMobile() ? 10 : 4}px 12px;
+  border-radius: 6px;
+  min-height: 26px;
   user-select: none;
   white-space: nowrap;
   margin-top: 1px;
   background: var(--background);
   color: ${(props) =>
     props.$isActiveDrop ? props.theme.white : props.theme.sidebarText};
-  font-size: 16px;
+  font-size: 14px;
   cursor: var(--pointer);
   overflow: hidden;
   border: 0;
@@ -344,8 +344,8 @@ const Link = styled(NavLink)<{
 
   ${breakpoint("tablet")`
     padding-block: 3px;
-    padding-inline: 12px 8px;
-    font-size: 14px;
+    padding-inline: 10px 8px;
+    font-size: 13px;
   `}
 
   @media (hover: hover) {
@@ -378,7 +378,7 @@ const Link = styled(NavLink)<{
 const Label = styled.div<{ $ellipsis: boolean }>`
   position: relative;
   width: 100%;
-  line-height: 24px;
+  line-height: 20px;
   margin-inline-start: 2px;
   min-width: 0;
   text-align: start;

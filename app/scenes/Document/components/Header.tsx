@@ -110,7 +110,7 @@ function DocumentHeader({
   const can = usePolicy(document);
   const { isDeleted } = document;
   const canToggleEmbeds = team?.documentEmbeds;
-  const showContents = ui.tocVisible === true;
+  const showContents = ui.tocVisible !== false;
 
   useEffect(() => {
     if (isMobile && showContents) {
