@@ -18,6 +18,13 @@ export default createGlobalStyle<Props>`
   html {
     --line-height-body: 1.65;
     --font-size-body: 16px;
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
 
   html,
@@ -152,9 +159,42 @@ export default createGlobalStyle<Props>`
     border-top: 1px solid ${s("divider")};
   }
 
-  /* GitBook-style thin scrollbars (sidebar, TOC, scrollable containers).
-     Track is transparent; thumb is faint and brightens on hover. */
-  #sidebar *,
+  /* GitBook-style thin scrollbars. Sidebar scrollbar is fully transparent
+     until the sidebar block is hovered/focused. */
+  #sidebar * {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    transition: scrollbar-color 200ms ease-out;
+  }
+  #sidebar:hover *,
+  #sidebar:focus-within * {
+    scrollbar-color: ${(props) =>
+      props.theme.isDark
+        ? "rgba(255,255,255,0.18) transparent"
+        : "rgba(0,0,0,0.22) transparent"};
+  }
+  #sidebar *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  #sidebar *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  #sidebar *::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 6px;
+    transition: background 200ms ease-out;
+  }
+  #sidebar:hover *::-webkit-scrollbar-thumb,
+  #sidebar:focus-within *::-webkit-scrollbar-thumb {
+    background: ${(props) =>
+      props.theme.isDark ? "rgba(255,255,255,0.16)" : "rgba(0,0,0,0.20)"};
+  }
+  #sidebar *::-webkit-scrollbar-thumb:hover {
+    background: ${(props) =>
+      props.theme.isDark ? "rgba(255,255,255,0.30)" : "rgba(0,0,0,0.34)"};
+  }
+
   [data-toc-list],
   .scrollable {
     scrollbar-width: thin;
@@ -163,29 +203,16 @@ export default createGlobalStyle<Props>`
         ? "rgba(255,255,255,0.12) transparent"
         : "rgba(0,0,0,0.18) transparent"};
   }
-  #sidebar *::-webkit-scrollbar,
   [data-toc-list]::-webkit-scrollbar,
   .scrollable::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
-  #sidebar *::-webkit-scrollbar-track,
-  [data-toc-list]::-webkit-scrollbar-track,
-  .scrollable::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  #sidebar *::-webkit-scrollbar-thumb,
   [data-toc-list]::-webkit-scrollbar-thumb,
   .scrollable::-webkit-scrollbar-thumb {
     background: ${(props) =>
       props.theme.isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.18)"};
     border-radius: 6px;
-  }
-  #sidebar *::-webkit-scrollbar-thumb:hover,
-  [data-toc-list]::-webkit-scrollbar-thumb:hover,
-  .scrollable::-webkit-scrollbar-thumb:hover {
-    background: ${(props) =>
-      props.theme.isDark ? "rgba(255,255,255,0.28)" : "rgba(0,0,0,0.32)"};
   }
 
   :focus-visible {
