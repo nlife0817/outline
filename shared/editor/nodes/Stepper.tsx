@@ -62,14 +62,14 @@ export default class Stepper extends Node {
   }
 
   inputRules({ type }: { type: NodeType }) {
-    return [wrappingInputRule(/^::::stepper$/, type)];
+    return [wrappingInputRule(/^:::::stepper$/, type)];
   }
 
   toMarkdown(state: MarkdownSerializerState, node: ProsemirrorNode) {
-    state.write("\n::::stepper\n");
+    state.write("\n:::::stepper\n");
     state.renderContent(node);
     state.ensureNewLine();
-    state.write("::::");
+    state.write(":::::");
     state.closeBlock(node);
   }
 

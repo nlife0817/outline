@@ -28,7 +28,7 @@ import { Theme } from "~/stores/UiStore";
 import { client } from "~/utils/ApiClient";
 import { AuthorizationError, OfflineError } from "~/utils/errors";
 import isCloudHosted from "~/utils/isCloudHosted";
-import { changeLanguage, detectLanguage } from "~/utils/language";
+import { changeLanguage } from "~/utils/language";
 import Loading from "../Document/components/Loading";
 import ErrorOffline from "../Errors/ErrorOffline";
 import { Collection as CollectionScene } from "./Collection";
@@ -169,7 +169,9 @@ function SharedScene() {
 
   useEffect(() => {
     if (!user) {
-      void changeLanguage(detectLanguage(), i18n);
+      // Force Russian for the public share view regardless of browser locale —
+      // this site is published in Russian only.
+      void changeLanguage("ru_RU", i18n);
     }
   }, [user, i18n]);
 

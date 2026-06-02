@@ -35,6 +35,7 @@ function CollectionLink({ node, shareId, hideRootNode }: Props) {
           }
           label={node.title || t("Untitled")}
           depth={0}
+          flatIndent
           exact={false}
           scrollIntoViewIfNeeded={true}
           isActive={() => ui.activeCollectionId === node.id}

@@ -73,6 +73,10 @@ export const languageOptions: LanguageOption[] = [
     value: "pl_PL",
   },
   {
+    label: "Русский (Russian)",
+    value: "ru_RU",
+  },
+  {
     label: "Português (Portuguese, Brazil)",
     value: "pt_BR",
   },

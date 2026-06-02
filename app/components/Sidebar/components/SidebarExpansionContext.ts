@@ -1,6 +1,71 @@
-import { action, observable } from "mobx";
-import { createContext, useContext, useState } from "react";
+import { action, observable, reaction } from "mobx";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { NavigationNode } from "@shared/types";
+
+/** localStorage key prefix for per-share manual expansion state. */
+const STORAGE_PREFIX = "sidebar.expanded.";
+
+/**
+ * Read persisted expanded node IDs for a given share from localStorage.
+ *
+ * @param shareId the share identifier used as the storage key suffix.
+ * @returns array of persisted node IDs, or an empty array if none/invalid.
+ */
+function readPersistedIds(shareId: string): string[] {
+  try {
+    const raw =
+      typeof window !== "undefined"
+        ? window.localStorage.getItem(STORAGE_PREFIX + shareId)
+        : null;
+    if (!raw) {
+      return [];
+    }
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((v) => typeof v === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Persist expanded node IDs for a given share to localStorage.
+ *
+ * @param shareId the share identifier used as the storage key suffix.
+ * @param ids iterable of node IDs to persist.
+ */
+function writePersistedIds(shareId: string, ids: Iterable<string>): void {
+  try {
+    if (typeof window === "undefined") {
+      return;
+    }
+    window.localStorage.setItem(
+      STORAGE_PREFIX + shareId,
+      JSON.stringify(Array.from(ids))
+    );
+  } catch {
+    // Storage unavailable (private mode, quota); silently skip.
+  }
+}
+
+/**
+ * Collect every node ID reachable from the given roots.
+ *
+ * @param roots top-level navigation nodes.
+ * @returns array of all node IDs in the tree.
+ */
+function collectAllIds(roots: NavigationNode[]): string[] {
+  const ids: string[] = [];
+  const walk = (nodes: NavigationNode[]) => {
+    for (const node of nodes) {
+      ids.push(node.id);
+      if (node.children.length) {
+        walk(node.children);
+      }
+    }
+  };
+  walk(roots);
+  return ids;
+}
 
 /**
  * Computes the set of node IDs along the path from any node in `roots` down
@@ -180,16 +245,100 @@ export function useSidebarExpansion(): SidebarExpansionState {
  */
 export function useSidebarExpansionState(
   roots: NavigationNode[] | undefined,
-  activeDocumentId: string | undefined
+  activeDocumentId: string | undefined,
+  shareId?: string
 ): SidebarExpansionState {
   const [state] = useState(() => new SidebarExpansionState());
-  // GitBook-like fork: keep the tree fully collapsed by default — the user
-  // expands branches manually. computeAncestorPath kept (re-exported for
-  // potential future use), but no longer auto-expands here.
-  void computeAncestorPath;
-  void roots;
-  void activeDocumentId;
-  return state;
+  const [initialized, setInitialized] = useState(false);
+
+  // On first render with a non-empty tree, restore persisted branches from
+  // localStorage if they exist; otherwise expand the entire tree so users see
+  // the full table of contents by default.
+  useEffect(() => {
+    if (initialized || !roots || roots.length === 0) {
+      return;
+    }
+    const persisted = shareId ? readPersistedIds(shareId) : [];
+    if (persisted.length) {
+      state.expandPath(persisted);
+    } else {
+      state.expandAll(roots);
+    }
+    setInitialized(true);
+  }, [state, shareId, roots, initialized]);
+
+  // Auto-expand only the ancestor path of the currently active document so
+  // the open page is visible after navigation/reload. Sibling branches stay
+  // collapsed (GitBook-like behaviour).
+  useEffect(() => {
+    if (!roots || !activeDocumentId) {
+      return;
+    }
+    const path = computeAncestorPath(roots, activeDocumentId);
+    if (path.length > 1) {
+      // Drop the active node itself — only expand its ancestors.
+      state.expandPath(path.slice(0, -1));
+    }
+  }, [state, roots, activeDocumentId]);
+
+  // Persist every change to localStorage, debounced.
+  useEffect(() => {
+    if (!shareId) {
+      return;
+    }
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const dispose = reaction(
+      () => Array.from(state.expandedIds),
+      (ids) => {
+        if (timer) {
+          clearTimeout(timer);
+        }
+        timer = setTimeout(() => {
+          writePersistedIds(shareId, ids);
+        }, 150);
+      },
+      { fireImmediately: true }
+    );
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+      dispose();
+    };
+  }, [state, shareId]);
+
+  // Memoise to keep referential stability for consumers.
+  return useMemo(() => state, [state]);
 }
+
+/**
+ * Hook returning helpers to expand or collapse every node in the tree at once.
+ *
+ * @param roots the top-level navigation nodes.
+ * @returns object with `expandAll`, `collapseAll`, and `allExpanded` flag.
+ */
+export function useTreeExpansionControls(
+  roots: NavigationNode[] | undefined
+): {
+  expandAll: () => void;
+  collapseAll: () => void;
+} {
+  const expansion = useSidebarExpansion();
+  return useMemo(
+    () => ({
+      expandAll: () => {
+        if (roots) {
+          expansion.expandAll(roots);
+        }
+      },
+      collapseAll: () => {
+        expansion.collapseAll();
+      },
+    }),
+    [expansion, roots]
+  );
+}
+
+export { collectAllIds };
 
 export default SidebarExpansionContext;

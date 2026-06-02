@@ -24,7 +24,8 @@ export default class Step extends Node {
 
   get schema(): NodeSpec {
     return {
-      content: "(paragraph | heading | list | blockquote | code_fence)+",
+      content:
+        "(paragraph | heading | list | blockquote | code_fence | attachment | container_notice)+",
       defining: true,
       parseDOM: [
         {
@@ -46,14 +47,14 @@ export default class Step extends Node {
   }
 
   inputRules({ type }: { type: NodeType }) {
-    return [wrappingInputRule(/^:::step$/, type)];
+    return [wrappingInputRule(/^::::step$/, type)];
   }
 
   toMarkdown(state: MarkdownSerializerState, node: ProsemirrorNode) {
-    state.write("\n:::step\n");
+    state.write("\n::::step\n");
     state.renderContent(node);
     state.ensureNewLine();
-    state.write(":::");
+    state.write("::::");
     state.closeBlock(node);
   }
 

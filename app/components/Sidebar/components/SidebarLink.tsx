@@ -47,12 +47,21 @@ type Props = Omit<NavLinkProps, "to"> & {
   active?: boolean;
   /** If set, a disclosure will be rendered to the left of any icon */
   expanded?: boolean;
+  /** If true, the disclosure chevron is rendered on the right side of the
+   *  row (instead of the default left). Used by the public/shared sidebar. */
+  disclosureRight?: boolean;
   /** Whether this link is the current active drop target for drag and drop */
   isActiveDrop?: boolean;
   /** Whether this link represents a draft document */
   isDraft?: boolean;
   /** Nesting depth level for indentation (0-based) */
   depth?: number;
+  /** If true, the depth multiplier is ignored when computing
+   *  `padding-inline-start`. Used by the public/shared sidebar where the
+   *  indentation is provided by the parent `ChildGroup` wrapper (matching
+   *  the GitBook preview's `ul.children { margin-left:14; padding-left:12 }`
+   *  structure). */
+  flatIndent?: boolean;
   /** Whether to truncate the label text (default: true, causes overflow: hidden) */
   ellipsis?: boolean;
   /** Whether to automatically scroll this link into view if needed */
@@ -87,8 +96,10 @@ function SidebarLink(
     exact,
     href,
     depth,
+    flatIndent,
     className,
     expanded,
+    disclosureRight,
     onDisclosureClick,
     disabled,
     unreadBadge,
@@ -104,10 +115,12 @@ function SidebarLink(
   const { handleMouseEnter, handleMouseLeave } = useClickIntent(onClickIntent);
   const style = React.useMemo(
     () => ({
-      paddingInlineStart: `${(depth || 0) * 12 + (icon ? -8 : 10)}px`,
+      paddingInlineStart: `${
+        (flatIndent ? 0 : (depth || 0) * 12) + (icon ? -8 : 10)
+      }px`,
       paddingInlineEnd: unreadBadge ? "32px" : undefined,
     }),
-    [depth, icon, unreadBadge]
+    [depth, icon, unreadBadge, flatIndent]
   );
 
   const unreadStyle = React.useMemo(
@@ -118,11 +131,11 @@ function SidebarLink(
   );
 
   // GitBook-style active state: no background pill, only a colored left bar
-  // and primary-tinted, semibold label.
+  // and primary-tinted, semibold label. Background is driven by CSS var so
+  // hover/focus can tint the row with accent-soft.
   const activeStyle = React.useMemo(
     () => ({
       color: theme.accent,
-      background: "transparent",
       fontWeight: 600,
       ...style,
     }),
@@ -180,6 +193,8 @@ function SidebarLink(
         $isActiveDrop={isActiveDrop}
         $isDraft={isDraft}
         $disabled={disabled}
+        $depth={depth || 0}
+        $disclosureRight={disclosureRight}
         style={active ? activeStyle : style}
         onClick={handleClick}
         onMouseEnter={handleMouseEnter}
@@ -200,6 +215,7 @@ function SidebarLink(
       $isActiveDrop={isActiveDrop}
       $isDraft={isDraft}
       $disabled={disabled}
+      $depth={depth || 0}
       style={active ? activeStyle : style}
       activeStyle={isActiveDrop ? activeDropStyle : activeStyle}
       onClick={handleClick}
@@ -276,6 +292,8 @@ const Link = styled(NavLink)<{
   $isActiveDrop?: boolean;
   $isDraft?: boolean;
   $disabled?: boolean;
+  $depth?: number;
+  $disclosureRight?: boolean;
 }>`
   &:hover,
   &:active,
@@ -293,9 +311,14 @@ const Link = styled(NavLink)<{
   position: relative;
   text-overflow: ellipsis;
   font-weight: 475;
-  padding: ${isMobile() ? 10 : 4}px 12px;
-  border-radius: 6px;
-  min-height: 26px;
+  /* Preview spec: padding 7px 10px, font 14px, line-height 1.4, radius 8px,
+     gap 8px between disclosure/icon and label. Mobile keeps the larger
+     vertical hitbox for touch. */
+  padding: ${isMobile() ? 10 : 7}px 10px;
+  gap: 8px;
+  border-radius: 8px;
+  min-height: 30px;
+  line-height: 1.4;
   user-select: none;
   white-space: nowrap;
   margin-top: 1px;
@@ -304,22 +327,62 @@ const Link = styled(NavLink)<{
     props.$isActiveDrop ? props.theme.white : props.theme.sidebarText};
   font-size: 14px;
   cursor: var(--pointer);
-  overflow: hidden;
+  overflow: visible;
   border: 0;
   width: 100%;
+  transition:
+    background-color 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 180ms cubic-bezier(0.22, 1, 0.36, 1);
   ${undraggableOnDesktop()}
 
-  /* GitBook-style active indicator: 2px vertical bar in accent color. */
+  /* Preview-spec active indicator: 2px accent bar sitting in the parent's
+     guide-line column (left: -13px relative to the row — children list has
+     margin-left:14 + padding-left:12, so -13 lands exactly on the guide). */
   &[aria-current="page"]::before {
     content: "";
     position: absolute;
-    left: 0;
+    left: -13px;
     top: 4px;
     bottom: 4px;
     width: 2px;
     background: ${(props) => props.theme.accent};
-    border-radius: 0 2px 2px 0;
+    border-radius: 2px;
+    transform-origin: center;
+    animation: sidebarLinkBarIn 280ms cubic-bezier(0.22, 1, 0.36, 1);
   }
+
+  @keyframes sidebarLinkBarIn {
+    from { transform: scaleY(0.2); opacity: 0; }
+    to   { transform: scaleY(1);   opacity: 1; }
+  }
+
+  /* Accent-soft tint on hover/focus when the row is the current page. */
+  &[aria-current="page"]:hover,
+  &[aria-current="page"]:active,
+  &[aria-current="page"]:has([data-state="open"]) {
+    --background: ${(props) => props.theme.accent}14;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &[aria-current="page"]::before { animation: none; }
+  }
+
+  ${(props) =>
+    props.$disclosureRight &&
+    css`
+      /* Disclosure chevron is moved from the default left (-24px) position
+         to the right edge of the row. Label gets reserved trailing space
+         so its ellipsised text stops before the chevron column. */
+      & ${Disclosure} {
+        inset-inline-start: auto;
+        inset-inline-end: 4px;
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+      & ${Label} {
+        padding-inline-end: 24px;
+      }
+    `}
 
   ${(props) =>
     props.$disabled &&
@@ -358,9 +421,10 @@ const Link = styled(NavLink)<{
   }
 
   ${breakpoint("tablet")`
-    padding-block: 3px;
-    padding-inline: 10px 8px;
-    font-size: 13px;
+    /* Preview spec is desktop-first: keep the spacious row on tablet+ too. */
+    padding-block: 7px;
+    padding-inline: 10px;
+    font-size: 14px;
   `}
 
   @media (hover: hover) {

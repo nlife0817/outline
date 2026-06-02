@@ -65,7 +65,8 @@ function SharedDocumentHeader({ document }: Props) {
   const isMobile = isMobileMedia || (size.width > 0 && size.width < 700);
 
   const handleToggle = useCallback(() => {
-    // Public shares, by default, show ToC on load.
+    // Public shares default to ToC visible. First click hides it; subsequent
+    // clicks flip the boolean.
     if (ui.tocVisible === undefined) {
       ui.set({ tocVisible: false });
     } else {

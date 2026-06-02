@@ -32,6 +32,7 @@ import {
   tr,
   vi,
   uk,
+  ru,
   zhCN,
   zhTW,
 } from "date-fns/locale";
@@ -279,6 +280,7 @@ const locales = {
   sv_SE: sv,
   tr_TR: tr,
   uk_UA: uk,
+  ru_RU: ru,
   vi_VN: vi,
   zh_CN: zhCN,
   zh_TW: zhTW,

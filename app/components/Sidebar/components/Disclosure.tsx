@@ -44,8 +44,8 @@ const StyledCollapsedIcon = styled(CollapsedIcon)<{
   $expanded?: boolean;
 }>`
   transition:
-    opacity 100ms ease,
-    transform 100ms ease,
+    opacity 180ms ease,
+    transform 280ms cubic-bezier(0.65, 0, 0.35, 1),
     fill 50ms !important;
 
   [aria-expanded="false"] & {
